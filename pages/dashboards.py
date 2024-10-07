@@ -3,7 +3,7 @@ import pandas as pd
 import altair as alt
 
 # Logo 
-st.image('icon.svg')
+st.logo('icon.svg')
 
 ### Importando os Dados ###
 @st.cache_data
@@ -100,8 +100,37 @@ if pagina_dashboard == 'Dashboards':
     # Filtrar para manter apenas os efeitos negativos que têm atividades associadas
     df_correlacao = df_correlacao[df_correlacao['Frequência'] > 0]
 
+    ### Correlação Faixa etaria, horas e estresse ###
+
+    # Filtrar colunas relevantes
+    df_filtered = df[['faixa_etaria', 'horas_dia', 'estresse_mes']]
+
+    # Excluir dados faltantes
+    df_filtered = df_filtered.dropna()
+
+    # Converter a coluna 'estresse_mes' para numérica (se os níveis de estresse forem categóricos, pode ser necessário mapeá-los)
+    stress_mapping = {
+        'Baixo': 1,
+        'Moderado': 2,
+        'Alto': 3,
+        'Muito Alto': 4
+    }
+
+    df_filtered['estresse_numerico'] = df_filtered['estresse_mes'].map(stress_mapping)
+
+    # Converter 'horas_dia' em números para o gráfico (mapeando as categorias em números)
+    horas_mapping = {
+        'Menos de 1 hora': 0.5,
+        '1 - 2 horas': 1.5,
+        '3 - 4 horas': 3.5,
+        '5 - 6 horas': 5.5,
+        'Mais de 6 horas': 7
+    }
+
+    df_filtered['horas_numerico'] = df_filtered['horas_dia'].map(horas_mapping)
+
     ######### Exibição dos gráficos #########
-    opcao = st.selectbox('Escolha uma opção:', ['Ocultar Gráfico', 'Média de Horas x Idade', 'Tempo de Tela x Qualidade do Sono', 'Atividade x Efeitos Negativos', 'Gráfico de Correlação'])
+    opcao = st.selectbox('Escolha uma opção:', ['Ocultar Gráfico', 'Média de Horas x Idade', 'Tempo de Tela x Qualidade do Sono', 'Gráfico de Correlação', 'Faixa Etária x Horas de Tela x Estresse'])
 
     if opcao == 'Média de Horas x Idade':
         st.write('### Média de Horas Diárias de Uso de Telas por Faixa Etária')
@@ -110,10 +139,6 @@ if pagina_dashboard == 'Dashboards':
     elif opcao == 'Tempo de Tela x Qualidade do Sono':
         st.write('Relação entre Tempo de Tela e Qualidade do Sono')
         st.bar_chart(media_sono.set_index('qualidade_sono_mes'), y='horas_dia_num')
-
-    elif opcao == 'Atividade x Efeitos Negativos':
-        st.title("Tabela de Correlação: Atividades vs Efeitos Negativos")
-        st.write(df_correlacao)
 
     elif opcao == 'Gráfico de Correlação':
         st.title("Gráfico de Correlação: Atividades vs Efeitos Negativos")
@@ -140,3 +165,40 @@ if pagina_dashboard == 'Dashboards':
         A altura de cada seção colorida indica a frequência com que esse efeito negativo foi associado à atividade.
         Você pode passar o mouse sobre as seções para ver detalhes específicos.
         """)
+        st.markdown("#### Tabela de Correlação: Atividades vs Efeitos Negativos")
+        st.dataframe(df_correlacao, use_container_width=True)
+
+    elif opcao == 'Faixa Etária x Horas de Tela x Estresse':
+        # Criação do gráfico de dispersão com Streamlit
+        st.write("Correlação entre Faixa Etária, Horas de Uso de Tela e Estresse")
+
+        # Usar scatter_chart com as colunas numéricas
+        st.scatter_chart(data=df_filtered, x='horas_numerico', y='estresse_numerico', color='faixa_etaria')
+        
+        # Criar os dados para a tabela de Nível de Estresse
+        estresse_data = {
+            'Nível de Estresse': ['Baixo', 'Moderado', 'Alto', 'Muito Alto'],
+            'Código': ['1', '2', '3', '4']
+        }
+        estresse_df = pd.DataFrame(estresse_data)
+
+        # Criar os dados para a tabela de Horas de Tela
+        horas_data = {
+            'Horas de Tela': ['Menos de 1 hora', '1 - 2 horas', '3 - 4 horas', '5 - 6 horas', 'Mais de 6 horas'],
+            'Código': ['0.5', '1.5', '3.5', '5.5', '7']
+        }
+        horas_df = pd.DataFrame(horas_data)
+
+        # Criar um espaço em branco para centralizar as colunas
+        st.write("Legendas") 
+        col1, col2 = st.columns(2)
+
+        # Tabela para Nível de Estresse na primeira coluna
+        with col1:
+            st.dataframe(estresse_df, hide_index=True, use_container_width=True)
+
+        # Tabela para Horas de Tela na segunda coluna
+        with col2:
+            st.dataframe(horas_df, hide_index=True, use_container_width=True)
+
+        st.write("")  # Espaço abaixo 
