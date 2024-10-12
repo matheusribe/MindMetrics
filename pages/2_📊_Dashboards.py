@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import plotly.express as px
+
+# Título do aplicativo
+st.set_page_config(layout="wide", page_title="MindMetric's")
 
 # Logo 
 st.logo('icon.svg')
@@ -14,9 +18,22 @@ df = carregar_dados()
 
 ### Visualização dos Dados ###
 st.sidebar.title('Menu')
-pagina_dashboard = st.sidebar.selectbox('Selecione uma opção:', ['Dashboards'])
+pagina_dashboard = st.sidebar.selectbox('Selecione uma opção:', ['Pesquisa', 'Correlações'])
 
-if pagina_dashboard == 'Dashboards':
+### Pesquisa ###
+col1, col2 = st.columns([3,2],gap='large',vertical_alignment='top')
+if pagina_dashboard == 'Pesquisa':
+    with col1:
+        st.metric(label="Respostas", value="104", help="Quantidade de respostas que a pesquisa obteve")
+        st.write("##### Quadro geral de respostas")
+        st.dataframe(df)
+    with col2:
+        fig = px.pie(df, names='faixa_etaria', color_discrete_sequence=px.colors.sequential.RdBu,title="Faixa Etária")
+        st.plotly_chart(fig)
+
+
+### Correlações ###
+elif pagina_dashboard == 'Correlações':
     ### Convertendo os valores da coluna 'horas_dia'
     def converter_horas(valor):
         if pd.isna(valor):
