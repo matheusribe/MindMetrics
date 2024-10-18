@@ -125,10 +125,27 @@ elif pagina_dashboard == 'Correlações':
     if opcao == 'Média de Horas x Idade':
         st.write('### Média de Horas Diárias de Uso de Telas por Faixa Etária')
         st.bar_chart(media_horas.set_index('faixa_etaria'), y='horas_dia_num', color='horas_dia_num', height=400, x_label='Faixa Etária', y_label='Média de Horas Diárias')
+        st.write("""
+        Este gráfico de barras mostra a média de horas diárias de uso de telas para cada faixa etária.
+        Ele ajuda a visualizar quais grupos de idade tendem a passar mais tempo em frente a dispositivos,
+        fornecendo uma visão geral do comportamento de uso de telas por idade.
+        """)
+        st.markdown("#### Tabela: Média de Horas Diárias por Faixa Etária")
+         # Renomear as colunas da tabela
+        media_horas_renomeada = media_horas.rename(columns={
+            'faixa_etaria': 'Faixa Etária',
+            'horas_dia_num': 'Média de Horas Diárias'
+        })
+        st.dataframe(media_horas_renomeada, use_container_width=True, hide_index=True)
+
 
     elif opcao == 'Tempo de Tela x Qualidade do Sono':
         st.write('### Relação entre Tempo de Tela e Qualidade do Sono')
         st.bar_chart(media_sono.set_index('qualidade_sono_mes'), y='horas_dia_num', color='horas_dia_num' , height=400, horizontal=True,x_label='Média de Horas Diárias', y_label='Qualidade do Sono')
+        st.write("""
+        Este gráfico de barras demonstra como o tempo de tela diário se relaciona com a qualidade do sono dos respondentes.
+        Isso oferece insights sobre como o uso prolongado de telas pode afetar o descanso e o bem-estar geral.
+        """)
 
     elif opcao == 'Atividades vs Efeitos Negativos':
         st.write("### Atividades em Telas e Efeitos Negativos")
@@ -155,4 +172,4 @@ elif pagina_dashboard == 'Correlações':
         Você pode passar o mouse sobre as seções para ver detalhes específicos.
         """)
         st.markdown("#### Tabela de Correlação: Atividades vs Efeitos Negativos")
-        st.dataframe(df_correlacao, use_container_width=True)
+        st.dataframe(df_correlacao, use_container_width=True, hide_index=True)
