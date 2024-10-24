@@ -8,17 +8,19 @@ def mostrar_horas_idade(df):
     
     st.bar_chart(
         media_horas.set_index('faixa_etaria'), 
-        y='horas_dia_num', 
+        y='horas_dia_num',
+        y_label='Média de Horas Diárias',
+        x_label= 'Faixa Etária',
         color='horas_dia_num', 
         height=400,
         use_container_width=True
     )
-    
-    st.write("""
-    Este gráfico de barras mostra a média de horas diárias de uso de telas para cada faixa etária.
+    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    sobre_grafico.write('''
+        Este gráfico de barras mostra a média de horas diárias de uso de telas para cada faixa etária.
     Ele ajuda a visualizar quais grupos de idade tendem a passar mais tempo em frente a dispositivos,
     fornecendo uma visão geral do comportamento de uso de telas por idade.
-    """)
+    ''')
     
     st.markdown("#### Tabela da Correlação: Média de Horas Diárias por Faixa Etária")
     media_horas_renomeada = media_horas.rename(columns={
@@ -33,16 +35,18 @@ def mostrar_tela_sono(df):
     
     st.bar_chart(
         media_sono.set_index('qualidade_sono_mes'), 
-        y='horas_dia_num', 
-        color='horas_dia_num', 
+        y='horas_dia_num',
+        y_label='Média de Horas Diárias',
+        x_label= 'Qualidade do Sono',
+        color='horas_dia_num',
         height=400,
         use_container_width=True
     )
-    
-    st.write("""
-    Este gráfico de barras demonstra como o tempo de tela diário se relaciona com a qualidade do sono dos respondentes.
+    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    sobre_grafico.write('''
+        Este gráfico de barras demonstra como o tempo de tela diário se relaciona com a qualidade do sono dos respondentes.
     Isso oferece insights sobre como o uso prolongado de telas pode afetar o descanso e o bem-estar geral.
-    """)
+    ''')
 
 def unificar_streaming(atividade):
     plataformas_streaming = ['Youtube', 'Netflix', 'Prime video', 'max', 'YouTube']
@@ -105,28 +109,30 @@ def mostrar_atividades_efeitos(df):
         color=alt.Color('Efeito_Negativo:N', title='Efeito Negativo', scale=alt.Scale(scheme='category20b')),
         tooltip=['Atividade', 'Efeito_Negativo', 'Frequência']
     ).properties(
-        width=600,
+        width="container",
         height=400,
     ).interactive()
     
     st.altair_chart(chart, use_container_width=True)
 
-    st.write("""
+    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    sobre_grafico.write('''
     Este gráfico de barras empilhadas mostra a correlação entre as atividades e os efeitos negativos.
     Cada barra representa uma atividade, e as seções coloridas dentro de cada barra representam os diferentes efeitos negativos.
     A altura de cada seção colorida indica a frequência com que esse efeito negativo foi associado à atividade.
     Você pode passar o mouse sobre as seções para ver detalhes específicos.
-    """)
+    ''')
+    
     st.markdown("#### Tabela da Correlação: Atividades vs Efeitos Negativos")
     st.dataframe(df_correlacao, use_container_width=True, hide_index=True)
 
 def mostrar_correlacoes(df):
-    opcao = st.selectbox('Escolha uma opção:', [
+    opcao = st.selectbox('Selecione uma correlação:', [
         'Selecione uma correlação:',
         'Média de Horas x Idade',
         'Tempo de Tela x Qualidade do Sono',
         'Atividades vs Efeitos Negativos'
-    ])
+    ], label_visibility='collapsed')
 
     if opcao == 'Média de Horas x Idade':
         mostrar_horas_idade(df)

@@ -3,7 +3,6 @@ import plotly.express as px
 import pandas as pd
 
 def contar_atividades(df):
-    """Conta a frequência de cada atividade permitida nas respostas"""
     atividades_permitidas = ["Trabalho", "Estudo", "Redes Sociais", "Streamings", "Jogos"]
     
     # Inicializa o dicionário para contar as atividades
@@ -57,12 +56,9 @@ def mostrar_pesquisa(df):
                         color_discrete_sequence=px.colors.sequential.Viridis)
             st.plotly_chart(fig)
             
-    # Adiciona a tabela e o gráfico de contagem de atividades
+    # Adiciona gráfico de contagem de atividades
     df_contagem = contar_atividades(df)
-    
-    st.metric(label="Sobre o gráfico", value="", 
-    help="O gráfico representa a frequência das principais atividades realizadas em telas pelos 105 participantes da pesquisa. As atividades são categorizadas em: Trabalho, Estudo, Redes Sociais, Streamings e Jogos. As barras horizontais mostram quantas pessoas relataram realizar cada uma dessas atividades, onde o eixo X indica o número de respostas e o eixo Y lista as atividades. A cor e o tamanho das barras são proporcionais à quantidade de respostas, facilitando a identificação visual das atividades mais comuns entre os participantes.")
-    
+
     # Cria o gráfico de barras horizontal
     fig = px.bar(df_contagem, 
                 x='Quantidade', 
@@ -85,3 +81,7 @@ def mostrar_pesquisa(df):
     
     # Exibe o gráfico
     st.plotly_chart(fig, use_container_width=True)
+    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    sobre_grafico.write('''
+        O gráfico representa a frequência das principais atividades realizadas em telas pelos 105 participantes da pesquisa. As barras horizontais mostram quantas pessoas relataram realizar cada uma dessas atividades. O eixo X indica o número de respostas e o eixo Y lista as atividades. A cor e o tamanho das barras são proporcionais à quantidade de respostas, facilitando a identificação visual das atividades mais comuns entre os participantes.
+    ''')
