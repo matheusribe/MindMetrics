@@ -123,7 +123,7 @@ def mostrar_atividades_efeitos(df):
     Você pode passar o mouse sobre as seções para ver detalhes específicos.
     ''')
     
-    st.markdown("#### Tabela da Correlação: Atividades vs Efeitos Negativos")
+    st.markdown("#### Tabela da Correlação: Atividades e Efeitos Negativos")
     st.dataframe(df_correlacao, use_container_width=True, hide_index=True)
 
 def mostrar_correlacoes(df):
@@ -131,12 +131,12 @@ def mostrar_correlacoes(df):
         'Selecione uma correlação:',
         'Média de Horas x Idade',
         'Tempo de Tela x Qualidade do Sono',
-        'Atividades vs Efeitos Negativos'
+        'Atividades x Efeitos Negativos'
     ], label_visibility='collapsed')
 
     if opcao == 'Média de Horas x Idade':
         mostrar_horas_idade(df)
     elif opcao == 'Tempo de Tela x Qualidade do Sono':
         mostrar_tela_sono(df)
-    elif opcao == 'Atividades vs Efeitos Negativos':
+    elif opcao == 'Atividades x Efeitos Negativos':
         mostrar_atividades_efeitos(df)
