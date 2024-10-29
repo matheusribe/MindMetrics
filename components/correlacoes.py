@@ -1,6 +1,7 @@
 import streamlit as st
 import altair as alt
 import pandas as pd
+import plotly.express as px
 
 def mostrar_horas_idade(df):
     st.write('### Média de Horas Diárias de Uso de Telas por Faixa Etária')
@@ -29,24 +30,93 @@ def mostrar_horas_idade(df):
     })
     st.dataframe(media_horas_renomeada, use_container_width=True, hide_index=True)
 
-def mostrar_tela_sono(df):
-    st.write('### Relação entre Tempo de Tela e Qualidade do Sono')
-    media_sono = df.groupby('qualidade_sono_mes')['horas_dia_num'].mean().apply(lambda x: round(x, 2)).reset_index()
+def mostrar_qualidade_sono(df):
+    st.write("### Relação entre a Qualidade do Sono  e Nível de Estresse")
+    # Mapeamento de qualidade do sono para valores numéricos
+    quality_mapping = {
+        '1 - Muito Ruim': 1,
+        '2 - Ruim': 2,
+        '3 - Regular': 3,
+        '4 - Bom': 4,
+        '5 - Excelente': 5
+    }
+    df['qualidade_sono_num'] = df['qualidade_sono_mes'].map(quality_mapping)
+
+    # Mapeamento de estresse para valores numéricos
+    stress_mapping = {
+        'Baixo': 1,
+        'Moderado': 2,
+        'Alto': 3,
+        'Muito alto': 4
+    }
+    df['estresse_mes_num'] = df['estresse_mes'].map(stress_mapping)
+
+    # Verifica se há valores ausentes após o mapeamento
+    if df['qualidade_sono_num'].isnull().any() or df['estresse_mes_num'].isnull().any():
+        st.error("Existem valores ausentes após o mapeamento. Verifique os dados de entrada.")
+        return
+
+    # Agrupando os dados por nível de estresse e calculando a média da qualidade do sono
+    df_grouped = df.groupby('estresse_mes').agg({'qualidade_sono_num': 'mean'}).reset_index()
+
+    # Mapeando a média para as categorias de qualidade do sono
+    def map_quality(num):
+        if num <= 1.5:
+            return '1 - Muito Ruim'
+        elif num <= 2.5:
+            return '2 - Ruim'
+        elif num <= 3.5:
+            return '3 - Regular'
+        elif num <= 4.5:
+            return '4 - Bom'
+        else:
+            return '5 - Excelente'
+
+    # Aplicando a função de mapeamento
+    df_grouped['qualidade_sono_str'] = df_grouped['qualidade_sono_num'].apply(map_quality)
+
+    # Ordenando o DataFrame do maior índice para o menor
+    df_grouped.sort_values(by='qualidade_sono_num', ascending=False, inplace=True)
+
+    # Remover duplicatas nas categorias de qualidade do sono
+    df_grouped = df_grouped.drop_duplicates(subset=['qualidade_sono_str'])
+
+    # Criando o gráfico de barras
+    fig_bar = px.bar(df_grouped, 
+                     x='estresse_mes', 
+                     y='qualidade_sono_num',
+                     title='Média da Qualidade do Sono por Nível de Estresse',
+                     labels={'qualidade_sono_num': 'Qualidade do Sono', 'estresse_mes': 'Nível de Estresse'},
+                     color='qualidade_sono_num',
+                     color_continuous_scale=px.colors.sequential.YlGnBu)
+
+    # Atualizando os rótulos do eixo y para mostrar as strings
+    fig_bar.update_yaxes(tickvals=df_grouped['qualidade_sono_num'], 
+                         ticktext=df_grouped['qualidade_sono_str'])
+
+    # Formatação das médias no hover com duas casas decimais
+    fig_bar.update_traces(hovertemplate='Nível de Estresse: %{x}<br>Média da Qualidade do Sono: %{y:.2f}')
+
+    # Exibindo o gráfico no Streamlit
+    st.plotly_chart(fig_bar)
+
+    # st.write('### Relação entre Tempo de Tela e Qualidade do Sono')
+    # media_sono = df.groupby('qualidade_sono_mes')['horas_dia_num'].mean().apply(lambda x: round(x, 2)).reset_index()
     
-    st.bar_chart(
-        media_sono.set_index('qualidade_sono_mes'), 
-        y='horas_dia_num',
-        y_label='Média de Horas Diárias',
-        x_label= 'Qualidade do Sono',
-        color='horas_dia_num',
-        height=400,
-        use_container_width=True
-    )
-    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
-    sobre_grafico.write('''
-        Este gráfico de barras demonstra como o tempo de tela diário se relaciona com a qualidade do sono dos respondentes.
-    Isso oferece insights sobre como o uso prolongado de telas pode afetar o descanso e o bem-estar geral.
-    ''')
+    # st.bar_chart(
+    #     media_sono.set_index('qualidade_sono_mes'), 
+    #     y='horas_dia_num',
+    #     y_label='Média de Horas Diárias',
+    #     x_label= 'Qualidade do Sono',
+    #     color='horas_dia_num',
+    #     height=400,
+    #     use_container_width=True
+    # )
+    # sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    # sobre_grafico.write('''
+    #     Este gráfico de barras demonstra como o tempo de tela diário se relaciona com a qualidade do sono dos respondentes.
+    # Isso oferece insights sobre como o uso prolongado de telas pode afetar o descanso e o bem-estar geral.
+    # ''')
 
 def unificar_streaming(atividade):
     plataformas_streaming = ['Youtube', 'Netflix', 'Prime video', 'max', 'YouTube']
@@ -130,13 +200,13 @@ def mostrar_correlacoes(df):
     opcao = st.selectbox('Selecione uma correlação:', [
         'Selecione uma correlação:',
         'Média de Horas x Idade',
-        'Tempo de Tela x Qualidade do Sono',
+        'Qualidade do Sono x Nível de Estresse',
         'Atividades x Efeitos Negativos'
     ], label_visibility='collapsed')
 
     if opcao == 'Média de Horas x Idade':
         mostrar_horas_idade(df)
-    elif opcao == 'Tempo de Tela x Qualidade do Sono':
-        mostrar_tela_sono(df)
+    elif opcao == 'Qualidade do Sono x Nível de Estresse':
+        mostrar_qualidade_sono(df)
     elif opcao == 'Atividades x Efeitos Negativos':
         mostrar_atividades_efeitos(df)
