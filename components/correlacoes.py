@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 
 def mostrar_horas_idade(df):
-    st.write('### Média de Horas Diárias de Uso de Telas por Faixa Etária')
+    st.write('### Relação entre Média de Horas Diárias de Uso de Telas por Faixa Etária')
     media_horas = df.groupby('faixa_etaria')['horas_dia_num'].mean().apply(lambda x: round(x, 2)).reset_index()
     
     st.bar_chart(
@@ -31,7 +31,7 @@ def mostrar_horas_idade(df):
     st.dataframe(media_horas_renomeada, use_container_width=True, hide_index=True)
 
 def mostrar_qualidade_sono(df):
-    st.write("### Relação entre a Qualidade do Sono  e Nível de Estresse")
+    st.write("### Relação entre a média da Qualidade do Sono e Nível de Estresse")
     # Mapeamento de qualidade do sono para valores numéricos
     quality_mapping = {
         '1 - Muito Ruim': 1,
@@ -85,7 +85,6 @@ def mostrar_qualidade_sono(df):
     fig_bar = px.bar(df_grouped, 
                      x='estresse_mes', 
                      y='qualidade_sono_num',
-                     title='Média da Qualidade do Sono por Nível de Estresse',
                      labels={'qualidade_sono_num': 'Qualidade do Sono', 'estresse_mes': 'Nível de Estresse'},
                      color='qualidade_sono_num',
                      color_continuous_scale=px.colors.sequential.YlGnBu)
@@ -97,8 +96,14 @@ def mostrar_qualidade_sono(df):
     # Formatação das médias no hover com duas casas decimais
     fig_bar.update_traces(hovertemplate='Nível de Estresse: %{x}<br>Média da Qualidade do Sono: %{y:.2f}')
 
-    # Exibindo o gráfico no Streamlit
+    # Exibindo o gráfico
     st.plotly_chart(fig_bar)
+    sobre_grafico = st.expander("Sobre o gráfico", icon="💡")
+    sobre_grafico.write('''
+        Este gráfico de barras mostra a média da qualidade do sono em relação ao nível de estresse.
+        Ele permite observar como diferentes níveis de estresse podem impactar a qualidade do sono,
+        oferecendo uma visão geral do bem-estar dos participantes em relação ao estresse mensal.
+    ''')
 
     # st.write('### Relação entre Tempo de Tela e Qualidade do Sono')
     # media_sono = df.groupby('qualidade_sono_mes')['horas_dia_num'].mean().apply(lambda x: round(x, 2)).reset_index()
@@ -159,7 +164,7 @@ def expandir_coluna(coluna_atividades, coluna_efeitos):
     return atividades_lista, efeitos_lista, responsaveis_lista
 
 def mostrar_atividades_efeitos(df):
-    st.write("### Atividades em Telas e Efeitos Negativos")
+    st.write("### Relação entre as Atividades em Telas e Efeitos Negativos")
     
     atividades_lista, efeitos_lista, responsaveis_lista = expandir_coluna(df['atividades'], df['efeitos_negativos'])
 
