@@ -15,7 +15,13 @@ def main():
 
     with tab2:
         st.subheader('Como arrecadamos os dados')
-        st.html("<div style='text-align: justify;'>Os dados foram arrecados por meio de uma pesquisa quantitativa, seguindo a práticas da lei geral de proteção de dados (LGPD), tratando as informações de maneira confidencial, usadas apenas para fins academicas, com 105 respondentes de faixa etária e gêneros variados. A coleta de dados se consentrou na identificação de comportamento de uso de dispositivos eletrônico e autoavaliações por parte dos respondentes. Dessa forma, é possível entender de maneira abrangente como os respondentes se relacionam com os impactos do uso de telas na saúde mental e no bem-estar.</div>")
+        col1, col2 = st.columns([4, 1], gap='large', vertical_alignment='center')
+        with col1:
+            st.html("<div style='text-align: justify;'>Os dados foram arrecados por meio de uma pesquisa quantitativa, seguindo a práticas da lei geral de proteção de dados (LGPD), tratando as informações de maneira confidencial, usadas apenas para fins academicas, com 105 respondentes de faixa etária e gêneros variados. A coleta de dados se consentrou na identificação de comportamento de uso de dispositivos eletrônico e autoavaliações por parte dos respondentes. Dessa forma, é possível entender de maneira abrangente como os respondentes se relacionam com os impactos do uso de telas na saúde mental e no bem-estar.</div>")
+        with col2:
+            st.metric(label="Demográficos", value="", help="Faixa Etária | Gênero")
+            st.metric(label="Uso de telas", value="", help="Frequência do uso de eletronicos | Quantidade de horas | Pricipais atividades")
+            st.metric(label="Bem-estar", value="",help= "Estresse | Qualidade do sono | Avaliação no impacto das telas | Principais efeitos negativos")
 
 if __name__ == "__main__":
     main()
