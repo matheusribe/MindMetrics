@@ -6,7 +6,7 @@ def main():
 
     st.header("MindMetric's", divider='gray')
     st.html("<div style='text-align: justify;'> É uma plataforma de Dashboards que tem como foco, entregar um ambiente de visualização de dados acerca do tempo de tela em dispositivos eletrônicos e como isso pode afetar sua saúde mental.</div>")
-    st.page_link('./pages/2_📊_dashboards.py', label='Visualizar dados', icon='📊')
+    st.page_link('./pages/Dashboards.py', label='Visualizar dados', icon='📊')
     
     tab1, tab2 = st.tabs(["Pesquisa", "Dados"])
     with tab1:
